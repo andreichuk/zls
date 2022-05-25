@@ -103,12 +103,11 @@ const Server = struct {
         // FIXME this shutdown request fails with a broken pipe on stdin on the CI
         self.request("shutdown", "{}", null) catch @panic("Could not send shutdown request");
         // waitNoError(self.process) catch @panic("Server error");
-        self.process.deinit();
     }
 };
 
 fn startZls() !*std.ChildProcess {
-    var process = try std.ChildProcess.init(&[_][]const u8{"zig-out/bin/zls" ++ suffix}, allocator);
+    var process = std.ChildProcess.init(&[_][]const u8{"zig-out/bin/zls" ++ suffix}, allocator);
     process.stdin_behavior = .Pipe;
     process.stdout_behavior = .Pipe;
     process.stderr_behavior = .Inherit;
@@ -118,7 +117,7 @@ fn startZls() !*std.ChildProcess {
         return err;
     };
 
-    return process;
+    return &process;
 }
 
 fn waitNoError(process: *std.ChildProcess) !void {
